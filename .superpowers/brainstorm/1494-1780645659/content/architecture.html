@@ -1,0 +1,61 @@
+<h2>整体架构设计</h2>
+<p class="subtitle">React + Three.js + Express + SQLite</p>
+
+<div class="mockup">
+  <div class="mockup-header">系统架构</div>
+  <div class="mockup-body" style="padding: 1.5rem; font-family: monospace; font-size: 0.85rem; line-height: 1.8;">
+<pre style="margin:0; color: #e2e8f0;">
+┌─────────────────────────────────────────────┐
+│              浏览器 (React SPA)              │
+│                                              │
+│  ┌──────────┐ ┌──────────┐ ┌──────────────┐ │
+│  │ 3D 视图  │ │ 控制面板 │ │ 列映射对话框 │ │
+│  │(R3F/Three)│ │(回放/切换)│ │(CSV列→字段)  │ │
+│  └─────┬────┘ └─────┬────┘ └──────┬───────┘ │
+│        └─────────────┼─────────────┘         │
+│                      │ REST API              │
+└──────────────────────┼───────────────────────┘
+                       │
+┌──────────────────────┼───────────────────────┐
+│              Express 后端                    │
+│                      │                       │
+│  ┌───────────┐ ┌─────┴─────┐ ┌────────────┐ │
+│  │ CSV 解析  │ │ 路径管理  │ │ 文件存储   │ │
+│  └─────┬─────┘ └─────┬─────┘ └──────┬─────┘ │
+│        └─────────────┼──────────────┘        │
+│                      │                       │
+│              ┌───────┴───────┐               │
+│              │    SQLite     │               │
+│              │ (路径/配置)   │               │
+│              └───────────────┘               │
+└──────────────────────────────────────────────┘
+</pre>
+  </div>
+</div>
+
+<div class="section" style="margin-top: 1.5rem;">
+  <h3>核心模块</h3>
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+    <div style="background: #1e293b; padding: 1rem; border-radius: 8px;">
+      <strong>前端</strong>
+      <ul style="margin: 0.5rem 0 0 0; padding-left: 1.2rem;">
+        <li>3D 场景 (react-three-fiber)</li>
+        <li>路径渲染 (线段 + 点位)</li>
+        <li>姿态坐标轴 (AxesHelper)</li>
+        <li>回放动画控制器</li>
+        <li>CSV 列映射对话框</li>
+        <li>多路径管理面板</li>
+      </ul>
+    </div>
+    <div style="background: #1e293b; padding: 1rem; border-radius: 8px;">
+      <strong>后端</strong>
+      <ul style="margin: 0.5rem 0 0 0; padding-left: 1.2rem;">
+        <li>CSV 上传与解析</li>
+        <li>路径 CRUD API</li>
+        <li>列映射配置存储</li>
+        <li>SQLite 数据持久化</li>
+        <li>静态文件托管 (build)</li>
+      </ul>
+    </div>
+  </div>
+</div>

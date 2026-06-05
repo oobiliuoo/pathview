@@ -1,0 +1,117 @@
+<h2>3D视图与回放动画</h2>
+<p class="subtitle">路径渲染、姿态显示、回放交互的具体设计</p>
+
+<div class="split">
+  <!-- 左：路径渲染 -->
+  <div class="mockup">
+    <div class="mockup-header">路径渲染方式</div>
+    <div class="mockup-body" style="padding: 1.5rem; background: #0a0f1a;">
+      <div style="text-align: center; margin-bottom: 16px;">
+        <svg width="320" height="200" viewBox="0 0 320 200" style="max-width: 100%;">
+          <!-- 网格 -->
+          <defs>
+            <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+              <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#1e293b" stroke-width="0.5"/>
+            </pattern>
+          </defs>
+          <rect width="320" height="200" fill="url(#grid)"/>
+          <!-- 路径线 -->
+          <polyline points="40,160 80,120 130,90 180,70 230,85 270,50" fill="none" stroke="#3b82f6" stroke-width="2" stroke-dasharray="0"/>
+          <!-- 点位 -->
+          <circle cx="40" cy="160" r="4" fill="#3b82f6"/>
+          <circle cx="80" cy="120" r="4" fill="#3b82f6"/>
+          <circle cx="130" cy="90" r="4" fill="#3b82f6"/>
+          <circle cx="180" cy="70" r="4" fill="#3b82f6"/>
+          <circle cx="230" cy="85" r="4" fill="#3b82f6"/>
+          <circle cx="270" cy="50" r="4" fill="#3b82f6"/>
+          <!-- 姿态坐标轴 (在点位2处放大示意) -->
+          <line x1="80" y1="120" x2="80" y2="95" stroke="#ef4444" stroke-width="2"/>
+          <line x1="80" y1="120" x2="105" y2="120" stroke="#22c55e" stroke-width="2"/>
+          <line x1="80" y1="120" x2="70" y2="130" stroke="#3b82f6" stroke-width="2"/>
+          <!-- 姿态坐标轴 (在点位4处) -->
+          <line x1="180" y1="70" x2="180" y2="45" stroke="#ef4444" stroke-width="2"/>
+          <line x1="180" y1="70" x2="205" y2="70" stroke="#22c55e" stroke-width="2"/>
+          <line x1="180" y1="70" x2="170" y2="80" stroke="#3b82f6" stroke-width="2"/>
+          <!-- 当前回放点 -->
+          <circle cx="130" cy="90" r="8" fill="none" stroke="#fbbf24" stroke-width="2">
+            <animate attributeName="r" values="6;10;6" dur="1.5s" repeatCount="indefinite"/>
+            <animate attributeName="opacity" values="1;0.5;1" dur="1.5s" repeatCount="indefinite"/>
+          </circle>
+          <circle cx="130" cy="90" r="4" fill="#fbbf24"/>
+          <!-- 图例 -->
+          <line x1="20" y1="190" x2="35" y2="190" stroke="#ef4444" stroke-width="2"/>
+          <text x="38" y="193" fill="#94a3b8" font-size="9">X轴</text>
+          <line x1="70" y1="190" x2="85" y2="190" stroke="#22c55e" stroke-width="2"/>
+          <text x="88" y="193" fill="#94a3b8" font-size="9">Y轴</text>
+          <line x1="120" y1="190" x2="135" y2="190" stroke="#3b82f6" stroke-width="2"/>
+          <text x="138" y="193" fill="#94a3b8" font-size="9">Z轴</text>
+          <circle cx="190" cy="190" r="4" fill="#3b82f6"/>
+          <text x="198" y="193" fill="#94a3b8" font-size="9">路径点</text>
+          <circle cx="250" cy="190" r="4" fill="#fbbf24"/>
+          <text x="258" y="193" fill="#94a3b8" font-size="9">当前点</text>
+        </svg>
+      </div>
+      <div style="color: #94a3b8; font-size: 0.8rem; line-height: 1.6;">
+        <ul style="padding-left: 1.2rem; margin: 0;">
+          <li><strong style="color:#e2e8f0">路径线段</strong> — 连接相邻点位的彩色线段，每条路径独立颜色</li>
+          <li><strong style="color:#e2e8f0">点位标记</strong> — 球体标记每个路径点，hover高亮</li>
+          <li><strong style="color:#e2e8f0">姿态坐标轴</strong> — RGB三色短轴表示Rx/Ry/Rz旋转后的方向</li>
+          <li><strong style="color:#e2e8f0">当前回放点</strong> — 黄色脉冲圆环标记</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- 右：回放控制 -->
+  <div class="mockup">
+    <div class="mockup-header">回放动画控制</div>
+    <div class="mockup-body" style="padding: 1.5rem; background: #1e293b;">
+      <div style="margin-bottom: 20px;">
+        <div style="color: #94a3b8; font-size: 0.7rem; text-transform: uppercase; margin-bottom: 10px;">播放控制</div>
+        <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 12px;">
+          <button style="background: #334155; color: #e2e8f0; border: none; width: 36px; height: 36px; border-radius: 4px; cursor: pointer; font-size: 0.9rem;">⏮</button>
+          <button style="background: #3b82f6; color: white; border: none; width: 44px; height: 44px; border-radius: 50%; cursor: pointer; font-size: 1.1rem;">▶</button>
+          <button style="background: #334155; color: #e2e8f0; border: none; width: 36px; height: 36px; border-radius: 4px; cursor: pointer; font-size: 0.9rem;">⏭</button>
+          <button style="background: #334155; color: #e2e8f0; border: none; width: 36px; height: 36px; border-radius: 4px; cursor: pointer; font-size: 0.9rem;">⏹</button>
+        </div>
+      </div>
+
+      <div style="margin-bottom: 20px;">
+        <div style="color: #94a3b8; font-size: 0.7rem; text-transform: uppercase; margin-bottom: 10px;">速度控制</div>
+        <div style="display: flex; gap: 6px;">
+          <button style="background: #334155; color: #94a3b8; border: none; padding: 4px 10px; border-radius: 4px; font-size: 0.75rem;">0.25x</button>
+          <button style="background: #334155; color: #94a3b8; border: none; padding: 4px 10px; border-radius: 4px; font-size: 0.75rem;">0.5x</button>
+          <button style="background: #3b82f6; color: white; border: none; padding: 4px 10px; border-radius: 4px; font-size: 0.75rem;">1x</button>
+          <button style="background: #334155; color: #94a3b8; border: none; padding: 4px 10px; border-radius: 4px; font-size: 0.75rem;">2x</button>
+          <button style="background: #334155; color: #94a3b8; border: none; padding: 4px 10px; border-radius: 4px; font-size: 0.75rem;">4x</button>
+        </div>
+      </div>
+
+      <div style="margin-bottom: 20px;">
+        <div style="color: #94a3b8; font-size: 0.7rem; text-transform: uppercase; margin-bottom: 10px;">回放模式</div>
+        <div style="display: flex; gap: 6px;">
+          <button style="background: #3b82f6; color: white; border: none; padding: 6px 12px; border-radius: 4px; font-size: 0.75rem;">逐点</button>
+          <button style="background: #334155; color: #94a3b8; border: none; padding: 6px 12px; border-radius: 4px; font-size: 0.75rem;">平滑</button>
+          <button style="background: #334155; color: #94a3b8; border: none; padding: 6px 12px; border-radius: 4px; font-size: 0.75rem;">循环</button>
+        </div>
+      </div>
+
+      <div>
+        <div style="color: #94a3b8; font-size: 0.7rem; text-transform: uppercase; margin-bottom: 10px;">相机跟踪</div>
+        <label style="display: flex; align-items: center; color: #e2e8f0; font-size: 0.8rem;">
+          <input type="checkbox" style="margin-right: 8px;"> 回放时相机跟随当前点
+        </label>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section" style="margin-top: 1.5rem;">
+  <h3>设计要点</h3>
+  <ul style="color: #94a3b8; line-height: 1.8;">
+    <li><strong>姿态坐标轴</strong> — 根据Rx/Ry/Rz欧拉角旋转标准坐标轴，轴长度可配置</li>
+    <li><strong>回放模式</strong> — 逐点（跳到每个点停顿）、平滑（线性插值过渡）、循环（到末尾自动重头）</li>
+    <li><strong>相机跟踪</strong> — 可选开启，回放时相机自动跟随当前点移动</li>
+    <li><strong>多路径颜色</strong> — 预设8色板，自动分配不同颜色给每条路径</li>
+  </ul>
+</div>

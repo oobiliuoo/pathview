@@ -1,0 +1,116 @@
+<h2>数据模型与 API 设计</h2>
+<p class="subtitle">SQLite 表结构 + REST API 端点</p>
+
+<div class="mockup">
+  <div class="mockup-header">SQLite 数据模型</div>
+  <div class="mockup-body" style="padding: 1.5rem; background: #1e293b; font-family: monospace; font-size: 0.8rem; line-height: 1.7;">
+    <div style="color: #3b82f6; margin-bottom: 4px;">-- 路径表</div>
+    <div style="color: #e2e8f0;">
+      <span style="color: #c084fc;">CREATE TABLE</span> paths (
+    </div>
+    <div style="color: #94a3b8; padding-left: 1.5rem;">
+      id <span style="color: #fbbf24;">INTEGER PRIMARY KEY</span>,
+    </div>
+    <div style="color: #94a3b8; padding-left: 1.5rem;">
+      name <span style="color: #fbbf24;">TEXT NOT NULL</span>,
+    </div>
+    <div style="color: #94a3b8; padding-left: 1.5rem;">
+      source_file <span style="color: #fbbf24;">TEXT</span>,
+    </div>
+    <div style="color: #94a3b8; padding-left: 1.5rem;">
+      has_orientation <span style="color: #fbbf24;">BOOLEAN DEFAULT 0</span>,
+    </div>
+    <div style="color: #94a3b8; padding-left: 1.5rem;">
+      point_count <span style="color: #fbbf24;">INTEGER DEFAULT 0</span>,
+    </div>
+    <div style="color: #94a3b8; padding-left: 1.5rem;">
+      color <span style="color: #fbbf24;">TEXT</span>,
+    </div>
+    <div style="color: #94a3b8; padding-left: 1.5rem;">
+      created_at <span style="color: #fbbf24;">DATETIME DEFAULT CURRENT_TIMESTAMP</span>
+    </div>
+    <div style="color: #e2e8f0;">);</div>
+
+    <div style="margin-top: 12px; color: #3b82f6; margin-bottom: 4px;">-- 路径点表</div>
+    <div style="color: #e2e8f0;">
+      <span style="color: #c084fc;">CREATE TABLE</span> path_points (
+    </div>
+    <div style="color: #94a3b8; padding-left: 1.5rem;">
+      id <span style="color: #fbbf24;">INTEGER PRIMARY KEY</span>,
+    </div>
+    <div style="color: #94a3b8; padding-left: 1.5rem;">
+      path_id <span style="color: #fbbf24;">INTEGER REFERENCES paths(id) ON DELETE CASCADE</span>,
+    </div>
+    <div style="color: #94a3b8; padding-left: 1.5rem;">
+      seq <span style="color: #fbbf24;">INTEGER NOT NULL</span>,
+    </div>
+    <div style="color: #94a3b8; padding-left: 1.5rem;">
+      x <span style="color: #fbbf24;">REAL NOT NULL</span>,
+    </div>
+    <div style="color: #94a3b8; padding-left: 1.5rem;">
+      y <span style="color: #fbbf24;">REAL NOT NULL</span>,
+    </div>
+    <div style="color: #94a3b8; padding-left: 1.5rem;">
+      z <span style="color: #fbbf24;">REAL NOT NULL</span>,
+    </div>
+    <div style="color: #94a3b8; padding-left: 1.5rem;">
+      rx <span style="color: #fbbf24;">REAL</span>,
+    </div>
+    <div style="color: #94a3b8; padding-left: 1.5rem;">
+      ry <span style="color: #fbbf24;">REAL</span>,
+    </div>
+    <div style="color: #94a3b8; padding-left: 1.5rem;">
+      rz <span style="color: #fbbf24;">REAL</span>
+    </div>
+    <div style="color: #e2e8f0;">);</div>
+
+    <div style="margin-top: 12px; color: #3b82f6; margin-bottom: 4px;">-- 列映射配置表</div>
+    <div style="color: #e2e8f0;">
+      <span style="color: #c084fc;">CREATE TABLE</span> column_mappings (
+    </div>
+    <div style="color: #94a3b8; padding-left: 1.5rem;">
+      id <span style="color: #fbbf24;">INTEGER PRIMARY KEY</span>,
+    </div>
+    <div style="color: #94a3b8; padding-left: 1.5rem;">
+      path_id <span style="color: #fbbf24;">INTEGER REFERENCES paths(id) ON DELETE CASCADE</span>,
+    </div>
+    <div style="color: #94a3b8; padding-left: 1.5rem;">
+      field <span style="color: #fbbf24;">TEXT NOT NULL</span>,
+    </div>
+    <div style="color: #94a3b8; padding-left: 1.5rem;">
+      csv_column <span style="color: #fbbf24;">TEXT NOT NULL</span>
+    </div>
+    <div style="color: #e2e8f0;">);</div>
+  </div>
+</div>
+
+<div class="mockup" style="margin-top: 1rem;">
+  <div class="mockup-header">REST API 端点</div>
+  <div class="mockup-body" style="padding: 1.5rem; background: #1e293b; font-size: 0.8rem; line-height: 1.9;">
+    <div style="display: grid; grid-template-columns: 80px 1fr 2fr; gap: 4px 12px; align-items: start;">
+      <span style="color: #22c55e; font-weight: 600; font-family: monospace;">POST</span>
+      <span style="color: #e2e8f0;">/api/paths/upload</span>
+      <span style="color: #94a3b8;">上传CSV，返回列名+预览数据</span>
+
+      <span style="color: #22c55e; font-weight: 600; font-family: monospace;">POST</span>
+      <span style="color: #e2e8f0;">/api/paths</span>
+      <span style="color: #94a3b8;">确认映射，创建路径（含点位数据）</span>
+
+      <span style="color: #3b82f6; font-weight: 600; font-family: monospace;">GET</span>
+      <span style="color: #e2e8f0;">/api/paths</span>
+      <span style="color: #94a3b8;">获取所有路径列表</span>
+
+      <span style="color: #3b82f6; font-weight: 600; font-family: monospace;">GET</span>
+      <span style="color: #e2e8f0;">/api/paths/:id</span>
+      <span style="color: #94a3b8;">获取路径详情+所有点位</span>
+
+      <span style="color: #ef4444; font-weight: 600; font-family: monospace;">DELETE</span>
+      <span style="color: #e2e8f0;">/api/paths/:id</span>
+      <span style="color: #94a3b8;">删除路径（级联删除点位和映射）</span>
+
+      <span style="color: #3b82f6; font-weight: 600; font-family: monospace;">GET</span>
+      <span style="color: #e2e8f0;">/api/paths/:id/points</span>
+      <span style="color: #94a3b8;">获取路径点位（支持分页）</span>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,125 @@
+<h2>页面布局设计</h2>
+<p class="subtitle">主界面分区与交互元素</p>
+
+<div class="mockup">
+  <div class="mockup-header">主界面布局</div>
+  <div class="mockup-body" style="padding: 0; font-size: 0.8rem;">
+    <div style="display: flex; height: 500px; background: #0f172a;">
+      <!-- 左侧面板 -->
+      <div style="width: 280px; background: #1e293b; border-right: 1px solid #334155; display: flex; flex-direction: column;">
+        <div style="padding: 12px 16px; border-bottom: 1px solid #334155; display: flex; justify-content: space-between; align-items: center;">
+          <strong style="color: #e2e8f0;">路径列表</strong>
+          <button style="background: #3b82f6; color: white; border: none; padding: 4px 12px; border-radius: 4px; font-size: 0.75rem; cursor: pointer;">+ 导入CSV</button>
+        </div>
+        <div style="flex: 1; padding: 8px; overflow-y: auto;">
+          <!-- 路径项1 -->
+          <div style="background: #334155; border-radius: 6px; padding: 10px; margin-bottom: 6px; border-left: 3px solid #3b82f6;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="color: #e2e8f0; font-weight: 500;">路径 1</span>
+              <div>
+                <span style="color: #94a3b8; font-size: 0.7rem;">128 点</span>
+                <span style="color: #22c55e; font-size: 0.65rem; margin-left: 6px;">● 含姿态</span>
+              </div>
+            </div>
+            <div style="color: #94a3b8; font-size: 0.7rem; margin-top: 4px;">robot_path_001.csv</div>
+          </div>
+          <!-- 路径项2 -->
+          <div style="background: #334155; border-radius: 6px; padding: 10px; margin-bottom: 6px; border-left: 3px solid #f59e0b;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="color: #e2e8f0; font-weight: 500;">路径 2</span>
+              <div>
+                <span style="color: #94a3b8; font-size: 0.7rem;">64 点</span>
+                <span style="color: #94a3b8; font-size: 0.65rem; margin-left: 6px;">○ 无姿态</span>
+              </div>
+            </div>
+            <div style="color: #94a3b8; font-size: 0.7rem; margin-top: 4px;">waypoints.csv</div>
+          </div>
+        </div>
+        <!-- 显示控制 -->
+        <div style="padding: 12px 16px; border-top: 1px solid #334155;">
+          <div style="color: #94a3b8; font-size: 0.7rem; text-transform: uppercase; margin-bottom: 8px;">显示控制</div>
+          <label style="display: flex; align-items: center; color: #e2e8f0; font-size: 0.8rem; margin-bottom: 6px;">
+            <input type="checkbox" checked style="margin-right: 8px;"> 姿态坐标轴
+          </label>
+          <label style="display: flex; align-items: center; color: #e2e8f0; font-size: 0.8rem; margin-bottom: 6px;">
+            <input type="checkbox" checked style="margin-right: 8px;"> 路径线段
+          </label>
+          <label style="display: flex; align-items: center; color: #e2e8f0; font-size: 0.8rem;">
+            <input type="checkbox" checked style="margin-right: 8px;"> 点位标记
+          </label>
+        </div>
+      </div>
+
+      <!-- 中间3D视图 -->
+      <div style="flex: 1; display: flex; flex-direction: column;">
+        <!-- 3D视口 -->
+        <div style="flex: 1; position: relative; background: #0a0f1a;">
+          <div style="position: absolute; top: 12px; left: 12px; color: #64748b; font-size: 0.7rem;">
+            左键旋转 · 右键平移 · 滚轮缩放
+          </div>
+          <!-- 模拟3D内容 -->
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;">
+            <div style="text-align: center;">
+              <div style="color: #3b82f6; font-size: 2rem;">⟐</div>
+              <div style="color: #64748b; font-size: 0.8rem; margin-top: 8px;">3D 路径视图</div>
+              <div style="color: #475569; font-size: 0.7rem; margin-top: 4px;">Three.js / react-three-fiber</div>
+            </div>
+          </div>
+          <!-- 坐标轴图例 -->
+          <div style="position: absolute; bottom: 12px; left: 12px; color: #94a3b8; font-size: 0.7rem;">
+            <span style="color: #ef4444;">■ X</span>
+            <span style="color: #22c55e; margin-left: 8px;">■ Y</span>
+            <span style="color: #3b82f6; margin-left: 8px;">■ Z</span>
+          </div>
+        </div>
+        <!-- 回放控制条 -->
+        <div style="height: 60px; background: #1e293b; border-top: 1px solid #334155; display: flex; align-items: center; padding: 0 16px; gap: 12px;">
+          <button style="background: #3b82f6; color: white; border: none; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; font-size: 0.9rem;">▶</button>
+          <div style="flex: 1; height: 4px; background: #334155; border-radius: 2px; position: relative;">
+            <div style="width: 35%; height: 100%; background: #3b82f6; border-radius: 2px;"></div>
+            <div style="position: absolute; left: 35%; top: -4px; width: 12px; height: 12px; background: #3b82f6; border-radius: 50%; transform: translateX(-50%);"></div>
+          </div>
+          <span style="color: #94a3b8; font-size: 0.75rem; min-width: 80px;">45 / 128</span>
+          <select style="background: #334155; color: #e2e8f0; border: none; padding: 4px 8px; border-radius: 4px; font-size: 0.75rem;">
+            <option>1x</option>
+            <option>2x</option>
+            <option>0.5x</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- 右侧信息面板 -->
+      <div style="width: 260px; background: #1e293b; border-left: 1px solid #334155; padding: 16px; overflow-y: auto;">
+        <div style="color: #94a3b8; font-size: 0.7rem; text-transform: uppercase; margin-bottom: 12px;">点位详情</div>
+        <div style="color: #64748b; font-size: 0.8rem; text-align: center; margin-top: 40px;">
+          点击路径上的点位<br/>查看详细数据
+        </div>
+        <!-- 模拟选中状态 -->
+        <div style="display: none;">
+          <div style="margin-bottom: 12px;">
+            <div style="color: #94a3b8; font-size: 0.7rem; margin-bottom: 4px;">位置</div>
+            <div style="color: #e2e8f0; font-size: 0.8rem; font-family: monospace;">
+              X: 120.500<br/>Y: -45.200<br/>Z: 330.100
+            </div>
+          </div>
+          <div>
+            <div style="color: #94a3b8; font-size: 0.7rem; margin-bottom: 4px;">姿态 (deg)</div>
+            <div style="color: #e2e8f0; font-size: 0.8rem; font-family: monospace;">
+              Rx: 90.000<br/>Ry: 0.000<br/>Rz: 45.000
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section" style="margin-top: 1.5rem;">
+  <h3>布局说明</h3>
+  <ul style="color: #94a3b8; line-height: 1.8;">
+    <li><strong>左侧面板</strong> — 路径列表（多路径管理）、导入按钮、显示控制开关</li>
+    <li><strong>中间3D视图</strong> — 主视图区，支持旋转/平移/缩放，底部回放控制条</li>
+    <li><strong>右侧面板</strong> — 选中点位的详细数据（位置+姿态）</li>
+    <li><strong>回放控制</strong> — 播放/暂停、进度条、点序号、速度选择</li>
+  </ul>
+</div>

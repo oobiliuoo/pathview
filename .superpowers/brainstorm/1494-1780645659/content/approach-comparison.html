@@ -1,0 +1,59 @@
+<h2>技术方案对比</h2>
+<p class="subtitle">三种前后端分离架构，本地/单机部署</p>
+
+<div class="options">
+  <div class="option" data-choice="a" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>React + Three.js + Express + SQLite</h3>
+      <p><strong>前端:</strong> React + Three.js (react-three-fiber) 构建3D视图</p>
+      <p><strong>后端:</strong> Express + SQLite 轻量持久化</p>
+      <p><strong>优点:</strong> 生态成熟、社区资源丰富、SQLite零配置</p>
+      <p><strong>缺点:</strong> 前端包体积较大、React对纯展示页略显重量级</p>
+    </div>
+  </div>
+
+  <div class="option" data-choice="b" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>Vue3 + Three.js + FastAPI + SQLite</h3>
+      <p><strong>前端:</strong> Vue3 + Three.js (troisjs) 构建3D视图</p>
+      <p><strong>后端:</strong> Python FastAPI + SQLite</p>
+      <p><strong>优点:</strong> Python生态好、FastAPI性能高且自带API文档、Vue3轻量</p>
+      <p><strong>缺点:</strong> 需要Python环境、前后端语言栈不同</p>
+    </div>
+  </div>
+
+  <div class="option" data-choice="c" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>Vue3 + Three.js + Express + SQLite</h3>
+      <p><strong>前端:</strong> Vue3 + Three.js (troisjs) 构建3D视图</p>
+      <p><strong>后端:</strong> Express + SQLite</p>
+      <p><strong>优点:</strong> 全JS栈、Vue3比React轻量、troisjs与Vue集成好</p>
+      <p><strong>缺点:</strong> troisjs社区比react-three-fiber小</p>
+    </div>
+  </div>
+</div>
+
+<div class="section" style="margin-top: 2rem;">
+  <h3>推荐：方案 B (Vue3 + Three.js + FastAPI + SQLite)</h3>
+  <div class="pros-cons">
+    <div class="pros">
+      <h4>推荐理由</h4>
+      <ul>
+        <li>Python后端在工业/机器人领域更常见，后续扩展方便</li>
+        <li>FastAPI自动生成API文档，调试方便</li>
+        <li>Vue3 + Vite 开发体验流畅</li>
+        <li>SQLite单文件数据库，本地部署零配置</li>
+      </ul>
+    </div>
+    <div class="cons">
+      <h4>需考虑</h4>
+      <ul>
+        <li>需要Python环境（可用uv管理）</li>
+        <li>前后端语言栈不同</li>
+      </ul>
+    </div>
+  </div>
+</div>

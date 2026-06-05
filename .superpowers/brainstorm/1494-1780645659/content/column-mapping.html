@@ -1,0 +1,121 @@
+<h2>CSV 列映射流程</h2>
+<p class="subtitle">导入CSV时，用户将文件列映射到标准字段</p>
+
+<div class="mockup">
+  <div class="mockup-header">列映射对话框</div>
+  <div class="mockup-body" style="padding: 1.5rem; background: #1e293b;">
+    <div style="max-width: 560px; margin: 0 auto;">
+      <h3 style="color: #e2e8f0; margin: 0 0 4px 0; font-size: 1rem;">导入路径数据</h3>
+      <p style="color: #94a3b8; font-size: 0.8rem; margin: 0 0 16px 0;">将CSV列映射到路径字段，系统已根据列名自动推测</p>
+
+      <!-- 文件预览 -->
+      <div style="background: #0f172a; border-radius: 6px; padding: 12px; margin-bottom: 16px; font-family: monospace; font-size: 0.7rem; color: #94a3b8; overflow-x: auto;">
+        <div style="color: #64748b; margin-bottom: 6px;">文件预览 (前3行)</div>
+        <div style="color: #e2e8f0;">
+          <div>pos_x, pos_y, pos_z, rot_x, rot_y, rot_z, speed</div>
+          <div style="color: #94a3b8;">100.0, -50.0, 300.0, 90.0, 0.0, 45.0, 200</div>
+          <div style="color: #94a3b8;">105.0, -48.0, 302.0, 91.0, 0.5, 44.0, 180</div>
+        </div>
+      </div>
+
+      <!-- 映射表 -->
+      <div style="color: #94a3b8; font-size: 0.7rem; text-transform: uppercase; margin-bottom: 8px;">字段映射</div>
+      <div style="display: grid; grid-template-columns: 120px 30px 1fr; gap: 8px; align-items: center;">
+        <!-- X -->
+        <div style="color: #ef4444; font-size: 0.85rem; font-weight: 500;">X 位置</div>
+        <div style="color: #64748b; text-align: center;">→</div>
+        <select style="background: #334155; color: #e2e8f0; border: 1px solid #475569; padding: 6px 10px; border-radius: 4px; font-size: 0.8rem;">
+          <option selected>pos_x</option>
+          <option>pos_y</option>
+          <option>pos_z</option>
+          <option>rot_x</option>
+          <option>rot_y</option>
+          <option>rot_z</option>
+          <option>speed</option>
+        </select>
+        <!-- Y -->
+        <div style="color: #22c55e; font-size: 0.85rem; font-weight: 500;">Y 位置</div>
+        <div style="color: #64748b; text-align: center;">→</div>
+        <select style="background: #334155; color: #e2e8f0; border: 1px solid #475569; padding: 6px 10px; border-radius: 4px; font-size: 0.8rem;">
+          <option>pos_x</option>
+          <option selected>pos_y</option>
+          <option>pos_z</option>
+          <option>rot_x</option>
+          <option>rot_y</option>
+          <option>rot_z</option>
+          <option>speed</option>
+        </select>
+        <!-- Z -->
+        <div style="color: #3b82f6; font-size: 0.85rem; font-weight: 500;">Z 位置</div>
+        <div style="color: #64748b; text-align: center;">→</div>
+        <select style="background: #334155; color: #e2e8f0; border: 1px solid #475569; padding: 6px 10px; border-radius: 4px; font-size: 0.8rem;">
+          <option>pos_x</option>
+          <option>pos_y</option>
+          <option selected>pos_z</option>
+          <option>rot_x</option>
+          <option>rot_y</option>
+          <option>rot_z</option>
+          <option>speed</option>
+        </select>
+        <!-- Rx -->
+        <div style="color: #f97316; font-size: 0.85rem; font-weight: 500;">Rx 姿态</div>
+        <div style="color: #64748b; text-align: center;">→</div>
+        <select style="background: #334155; color: #e2e8f0; border: 1px solid #475569; padding: 6px 10px; border-radius: 4px; font-size: 0.8rem;">
+          <option>pos_x</option>
+          <option>pos_y</option>
+          <option>pos_z</option>
+          <option selected>rot_x</option>
+          <option>rot_y</option>
+          <option>rot_z</option>
+          <option>speed</option>
+        </select>
+        <!-- Ry -->
+        <div style="color: #a855f7; font-size: 0.85rem; font-weight: 500;">Ry 姿态</div>
+        <div style="color: #64748b; text-align: center;">→</div>
+        <select style="background: #334155; color: #e2e8f0; border: 1px solid #475569; padding: 6px 10px; border-radius: 4px; font-size: 0.8rem;">
+          <option>pos_x</option>
+          <option>pos_y</option>
+          <option>pos_z</option>
+          <option>rot_x</option>
+          <option selected>rot_y</option>
+          <option>rot_z</option>
+          <option>speed</option>
+        </select>
+        <!-- Rz -->
+        <div style="color: #ec4899; font-size: 0.85rem; font-weight: 500;">Rz 姿态</div>
+        <div style="color: #64748b; text-align: center;">→</div>
+        <select style="background: #334155; color: #e2e8f0; border: 1px solid #475569; padding: 6px 10px; border-radius: 4px; font-size: 0.8rem;">
+          <option>pos_x</option>
+          <option>pos_y</option>
+          <option>pos_z</option>
+          <option>rot_x</option>
+          <option>rot_y</option>
+          <option selected>rot_z</option>
+          <option>speed</option>
+        </select>
+      </div>
+
+      <!-- 提示 -->
+      <div style="background: #1e3a5f; border-radius: 6px; padding: 10px; margin-top: 16px; font-size: 0.75rem; color: #93c5fd;">
+        💡 姿态字段为可选。如果CSV不含姿态列，系统将只显示点位位置。
+      </div>
+
+      <!-- 按钮 -->
+      <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 20px;">
+        <button style="background: #334155; color: #e2e8f0; border: none; padding: 8px 20px; border-radius: 4px; cursor: pointer;">取消</button>
+        <button style="background: #3b82f6; color: white; border: none; padding: 8px 20px; border-radius: 4px; cursor: pointer; font-weight: 500;">确认导入</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section" style="margin-top: 1.5rem;">
+  <h3>映射流程</h3>
+  <ol style="color: #94a3b8; line-height: 2; padding-left: 1.2rem;">
+    <li>用户点击"导入CSV"，选择文件</li>
+    <li>后端解析CSV，返回列名列表和前3行预览数据</li>
+    <li>前端根据列名关键词自动推测映射（如 pos_x→X, rot_x→Rx）</li>
+    <li>用户确认或调整映射，姿态字段可选</li>
+    <li>确认后后端按映射提取数据，存入数据库</li>
+  </ol>
+</div>
