@@ -44,13 +44,13 @@ function App() {
     if (!uploadResult) return;
     const points = uploadResult.rows.map((row) => {
       const point: Record<string, any> = {
-        x: parseFloat(row[mapping.x]),
-        y: parseFloat(row[mapping.y]),
-        z: parseFloat(row[mapping.z]),
+        x: parseFloat(row[mapping.x]) || 0,
+        y: parseFloat(row[mapping.y]) || 0,
+        z: parseFloat(row[mapping.z]) || 0,
       };
-      if (mapping.rx) point.rx = parseFloat(row[mapping.rx]);
-      if (mapping.ry) point.ry = parseFloat(row[mapping.ry]);
-      if (mapping.rz) point.rz = parseFloat(row[mapping.rz]);
+      if (mapping.rx && row[mapping.rx] !== '' && row[mapping.rx] != null) point.rx = parseFloat(row[mapping.rx]) || 0;
+      if (mapping.ry && row[mapping.ry] !== '' && row[mapping.ry] != null) point.ry = parseFloat(row[mapping.ry]) || 0;
+      if (mapping.rz && row[mapping.rz] !== '' && row[mapping.rz] != null) point.rz = parseFloat(row[mapping.rz]) || 0;
       return point;
     });
 

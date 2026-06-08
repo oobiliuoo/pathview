@@ -6,11 +6,23 @@ export interface CsvParseResult {
 }
 
 export function parseCsv(buffer: Buffer): CsvParseResult {
-  const records = parse(buffer, {
+  let content = buffer.toString('utf-8');
+  // Remove BOM header if present (common in Excel-exported CSVs)
+  if (content.charCodeAt(0) === 0xFEFF) {
+    content = content.slice(1);
+  }
+
+  const records = parse(content, {
     columns: true,
     skip_empty_lines: true,
     trim: true,
+    relax_column_count: true,
   });
-  const columns = Object.keys(records[0] || {});
+
+  if (records.length === 0) {
+    return { columns: [], rows: [] };
+  }
+
+  const columns = Object.keys(records[0]);
   return { columns, rows: records };
 }

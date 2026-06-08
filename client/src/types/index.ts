@@ -35,7 +35,9 @@ export interface ColumnMapping {
 }
 
 export interface CsvUploadResult {
+  fileId: string;
   columns: string[];
+  rows: Record<string, string>[];
   rowCount: number;
   mapping: Partial<ColumnMapping>;
   fileName: string;
