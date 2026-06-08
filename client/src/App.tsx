@@ -45,9 +45,8 @@ function App() {
     }
   }, []);
 
-  const handleMappingConfirm = useCallback(async (mapping: ColumnMapping) => {
-    if (!uploadResult) return;
-    const points = uploadResult.rows.map((row) => {
+  const handleMappingConfirm = useCallback(async (mapping: ColumnMapping, rows: Record<string, string>[]) => {
+    const points = rows.map((row) => {
       const point: Record<string, any> = {
         x: parseFloat(row[mapping.x]) || 0,
         y: parseFloat(row[mapping.y]) || 0,
@@ -67,7 +66,7 @@ function App() {
     } catch (err) {
       alert((err as Error).message);
     }
-  }, [uploadResult, importFileName, loadPaths]);
+  }, [importFileName, loadPaths]);
 
   const handlePointClick = useCallback((index: number) => {
     setSelectedPointIndex(index);
@@ -136,8 +135,7 @@ function App() {
       </div>
       {uploadResult && (
         <ColumnMapper
-          columns={uploadResult.columns}
-          initialMapping={uploadResult.mapping}
+          uploadResult={uploadResult}
           onConfirm={handleMappingConfirm}
           onCancel={() => setUploadResult(null)}
         />

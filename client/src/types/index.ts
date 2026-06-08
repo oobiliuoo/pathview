@@ -41,6 +41,18 @@ export interface CsvUploadResult {
   rowCount: number;
   mapping: Partial<ColumnMapping>;
   fileName: string;
+  hasHeader: boolean;
+  rawPreview: string[][];
+  totalColumns: number;
+}
+
+export interface CsvReparseResult {
+  columns: string[];
+  rows: Record<string, string>[];
+  rowCount: number;
+  mapping: Partial<ColumnMapping>;
+  rawPreview: string[][];
+  totalColumns: number;
 }
 
 export type PlaybackMode = 'point' | 'smooth' | 'loop';

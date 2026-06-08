@@ -1,4 +1,4 @@
-import type { Path, PathWithPoints, CsvUploadResult, ColumnMapping } from '../types/index.js';
+import type { Path, PathWithPoints, CsvUploadResult, CsvReparseResult, ColumnMapping } from '../types/index.js';
 
 const API_BASE = '/api/paths';
 
@@ -52,6 +52,19 @@ export async function uploadCsv(file: File): Promise<CsvUploadResult> {
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
     throw new Error(err.error || 'Failed to upload CSV');
+  }
+  return res.json();
+}
+
+export async function reparseCsv(fileId: string, headerRow: number): Promise<CsvReparseResult> {
+  const res = await fetch(`${API_BASE}/reparse`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ fileId, headerRow }),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error || 'Failed to reparse CSV');
   }
   return res.json();
 }

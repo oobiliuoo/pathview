@@ -4,7 +4,7 @@ import { join } from 'path';
 import { fileURLToPath } from 'url';
 import { readFileSync, unlinkSync, mkdirSync } from 'fs';
 import db from '../db.js';
-import { parseCsv } from '../services/csvParser.js';
+import { parseCsv, parseCsvRaw, detectHeader } from '../services/csvParser.js';
 import { autoMatchColumns } from '../services/columnMatcher.js';
 import type { Path, PathPoint, CreatePathRequest } from '../types/index.js';
 
@@ -34,21 +34,16 @@ router.post('/upload', upload.single('file'), (req, res) => {
   if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
   try {
     const buffer = readFileSync(req.file.path);
-    const { columns, rows } = parseCsv(buffer);
-    if (rows.length === 0) {
+    const rawRows = parseCsvRaw(buffer);
+    if (rawRows.length === 0) {
       unlinkSync(req.file.path);
       return res.status(400).json({ error: 'CSV file has no data rows' });
     }
+    const rawPreview = rawRows.slice(0, 5);
+    const detectedHeader = rawPreview.length > 0 ? detectHeader(rawPreview[0]) : true;
+    const headerRow = detectedHeader ? 0 : -1;
+    const { columns, rows, totalColumns } = parseCsv(buffer, headerRow);
     const mapping = autoMatchColumns(columns);
-    if (!mapping.x || !mapping.y || !mapping.z) {
-      unlinkSync(req.file.path);
-      return res.status(400).json({
-        error: 'Could not auto-detect position columns (X/Y/Z). Please check your CSV.',
-        columns,
-        rowCount: rows.length,
-        mapping,
-      });
-    }
     res.json({
       fileId: req.file.filename,
       columns,
@@ -56,9 +51,30 @@ router.post('/upload', upload.single('file'), (req, res) => {
       rowCount: rows.length,
       mapping,
       fileName: req.file.originalname,
+      hasHeader: detectedHeader,
+      rawPreview,
+      totalColumns,
     });
   } catch (err) {
     try { if (req.file) unlinkSync(req.file.path); } catch {}
+    res.status(400).json({ error: (err as Error).message });
+  }
+});
+
+// POST /api/paths/reparse - re-parse uploaded CSV with different header row
+router.post('/reparse', (req, res) => {
+  const { fileId, headerRow } = req.body;
+  if (!fileId || headerRow === undefined) return res.status(400).json({ error: 'fileId and headerRow are required' });
+  const filePath = join(uploadsDir, fileId);
+  try {
+    const buffer = readFileSync(filePath);
+    const rawRows = parseCsvRaw(buffer);
+    if (rawRows.length === 0) return res.status(400).json({ error: 'CSV file has no data rows' });
+    const rawPreview = rawRows.slice(0, 5);
+    const { columns, rows, totalColumns } = parseCsv(buffer, headerRow);
+    const mapping = autoMatchColumns(columns);
+    res.json({ columns, rows, rowCount: rows.length, mapping, rawPreview, totalColumns });
+  } catch (err) {
     res.status(400).json({ error: (err as Error).message });
   }
 });
@@ -72,24 +88,25 @@ router.post('/', (req, res) => {
   }
 
   const hasOrientation = points.some((p) => p.rx !== undefined || p.ry !== undefined || p.rz !== undefined);
+  const colors = ['#3b82f6', '#f59e0b', '#22c55e', '#ef4444', '#a855f7', '#ec4899', '#06b6d4', '#f97316'];
+  const existingCount = (db.prepare('SELECT COUNT(*) as c FROM paths').get() as any).c;
+  const color = colors[existingCount % colors.length];
+
   const insertPath = db.prepare(`
     INSERT INTO paths (name, source_file, has_orientation, point_count, color)
     VALUES (?, ?, ?, ?, ?)
   `);
-  const colors = ['#3b82f6', '#f59e0b', '#22c55e', '#ef4444', '#a855f7', '#ec4899', '#06b6d4', '#f97316'];
-  const existingCount = (db.prepare('SELECT COUNT(*) as c FROM paths').get() as any).c;
-  const color = colors[existingCount % colors.length];
-  const result = insertPath.run(name, source_file || null, hasOrientation ? 1 : 0, points.length, color);
-  const pathId = Number(result.lastInsertRowid);
-
   const insertPoint = db.prepare(`
     INSERT INTO path_points (path_id, seq, x, y, z, rx, ry, rz, extra)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
   `);
 
-  const insertMany = db.transaction((pts: any[]) => {
-    for (let i = 0; i < pts.length; i++) {
-      const p = pts[i];
+  const createAll = db.transaction(() => {
+    const result = insertPath.run(name, source_file || null, hasOrientation ? 1 : 0, points.length, color);
+    const pathId = Number(result.lastInsertRowid);
+
+    for (let i = 0; i < points.length; i++) {
+      const p = points[i];
       const extra: Record<string, number | string> = {};
       for (const [k, v] of Object.entries(p)) {
         if (!['x', 'y', 'z', 'rx', 'ry', 'rz'].includes(k) && v !== undefined && v !== null) {
@@ -108,10 +125,11 @@ router.post('/', (req, res) => {
         Object.keys(extra).length > 0 ? JSON.stringify(extra) : null
       );
     }
+    return pathId;
   });
 
   try {
-    insertMany(points);
+    const pathId = createAll();
     res.status(201).json({ id: pathId });
   } catch (err) {
     res.status(500).json({ error: (err as Error).message });
