@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { Canvas } from '@react-three/fiber';
-import { OrbitControls, Grid } from '@react-three/drei';
+import { OrbitControls } from '@react-three/drei';
 import * as THREE from 'three';
 import type { PathWithPoints } from '../types/index.js';
 import PathLine from './PathLine.js';
@@ -24,40 +24,59 @@ export default function Scene3D({
   showPoints,
   onPointClick,
 }: Scene3DProps) {
-  const cameraTarget = useMemo(() => {
-    if (!path || path.points.length === 0) return new THREE.Vector3(0, 0, 0);
-    const p = path.points[currentIndex] || path.points[0];
-    return new THREE.Vector3(p.x, p.y, p.z);
-  }, [path, currentIndex]);
+  const { cameraTarget, scaleFactor, cameraPosition, near, far } = useMemo(() => {
+    if (!path || path.points.length === 0) {
+      return {
+        cameraTarget: new THREE.Vector3(0, 0, 0),
+        scaleFactor: 1,
+        cameraPosition: new THREE.Vector3(10, 10, 10),
+        near: 0.01,
+        far: 2000,
+      };
+    }
 
-  const scaleFactor = useMemo(() => {
-    if (!path || path.points.length === 0) return 1;
     const min = new THREE.Vector3(Infinity, Infinity, Infinity);
     const max = new THREE.Vector3(-Infinity, -Infinity, -Infinity);
     for (const p of path.points) {
       min.min(new THREE.Vector3(p.x, p.y, p.z));
       max.max(new THREE.Vector3(p.x, p.y, p.z));
     }
+
+    const center = new THREE.Vector3().addVectors(min, max).multiplyScalar(0.5);
     const diagonal = min.distanceTo(max);
-    return diagonal > 0 ? diagonal * 0.01 : 1;
+    const safeDiagonal = diagonal > 0 ? diagonal : 1;
+    const sf = safeDiagonal * 0.01;
+
+    // Place camera far enough to see the whole path
+    const camDist = safeDiagonal * 1.5;
+    const camPos = center.clone().add(new THREE.Vector3(camDist * 0.7, camDist * 0.5, camDist * 0.7));
+
+    // Tight near/far ratio to maximize depth buffer precision
+    // near = small fraction of scene size, far = large multiple
+    const n = safeDiagonal * 0.001;
+    const f = safeDiagonal * 100;
+
+    return {
+      cameraTarget: center,
+      scaleFactor: sf,
+      cameraPosition: camPos,
+      near: Math.max(n, 0.001),
+      far: Math.max(f, 100),
+    };
   }, [path]);
 
   return (
-    <Canvas camera={{ position: [10, 10, 10], fov: 50 }}>
-      <ambientLight intensity={0.5} />
-      <pointLight position={[10, 10, 10]} />
-      <Grid
-        args={[100, 100]}
-        cellSize={1}
-        cellThickness={0.5}
-        cellColor="#6b7280"
-        sectionSize={5}
-        sectionThickness={1}
-        sectionColor="#374151"
-        fadeDistance={50}
-        fadeStrength={1}
-        infiniteGrid
-      />
+    <Canvas
+      camera={{
+        position: cameraPosition,
+        fov: 50,
+        near,
+        far,
+      }}
+      gl={{ logarithmicDepthBuffer: true }}
+    >
+      <ambientLight intensity={0.6} />
+      <directionalLight position={[100, 200, 100]} intensity={0.8} />
       <OrbitControls target={cameraTarget} />
       {path && (
         <>

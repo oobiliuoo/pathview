@@ -39,7 +39,7 @@ export default function OrientationAxes({ points, currentIndex, scaleFactor }: O
   return (
     <group>
       {/* X axis - Red */}
-      <line>
+      <line frustumCulled={false}>
         <bufferGeometry>
           <bufferAttribute
             attach="attributes-position"
@@ -54,7 +54,7 @@ export default function OrientationAxes({ points, currentIndex, scaleFactor }: O
         <lineBasicMaterial color="#ef4444" linewidth={3} />
       </line>
       {/* Y axis - Green */}
-      <line>
+      <line frustumCulled={false}>
         <bufferGeometry>
           <bufferAttribute
             attach="attributes-position"
@@ -69,7 +69,7 @@ export default function OrientationAxes({ points, currentIndex, scaleFactor }: O
         <lineBasicMaterial color="#10b981" linewidth={3} />
       </line>
       {/* Z axis - Blue */}
-      <line>
+      <line frustumCulled={false}>
         <bufferGeometry>
           <bufferAttribute
             attach="attributes-position"

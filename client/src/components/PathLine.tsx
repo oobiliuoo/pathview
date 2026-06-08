@@ -21,7 +21,7 @@ export default function PathLine({ points, color }: PathLineProps) {
   }, [points]);
 
   return (
-    <line geometry={geometry}>
+    <line geometry={geometry} frustumCulled={false}>
       <lineBasicMaterial color={color} linewidth={2} />
     </line>
   );
