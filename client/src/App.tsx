@@ -22,6 +22,7 @@ function App() {
     loadPaths,
     loadPathDetail,
     removePath,
+    changeColor,
   } = usePaths();
 
   const playback = usePlayback(selectedPath?.points || []);
@@ -81,6 +82,7 @@ function App() {
           onSelectPath={loadPathDetail}
           onDeletePath={removePath}
           onImportCsv={handleImportCsv}
+          onChangeColor={changeColor}
         />
       </div>
       <div className="app-main">

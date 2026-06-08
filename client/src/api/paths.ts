@@ -32,6 +32,16 @@ export async function deletePath(id: number): Promise<void> {
   if (!res.ok) throw new Error('Failed to delete path');
 }
 
+export async function updatePathColor(id: number, color: string): Promise<{ id: number; color: string }> {
+  const res = await fetch(`${API_BASE}/${id}/color`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ color }),
+  });
+  if (!res.ok) throw new Error('Failed to update path color');
+  return res.json();
+}
+
 export async function uploadCsv(file: File): Promise<CsvUploadResult> {
   const formData = new FormData();
   formData.append('file', file);
