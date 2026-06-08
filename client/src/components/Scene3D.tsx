@@ -1,11 +1,12 @@
-import { useMemo } from 'react';
-import { Canvas } from '@react-three/fiber';
+import { useMemo, useRef, useEffect } from 'react';
+import { Canvas, useThree, useFrame } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import * as THREE from 'three';
 import type { PathPoint, PathWithPoints } from '../types/index.js';
 import PathLine from './PathLine.js';
 import PathPoints from './PathPoints.js';
 import OrientationAxes from './OrientationAxes.js';
+import type { ViewPreset } from './ViewTools.js';
 
 function AllOrientationAxes({ points, scaleFactor }: { points: PathPoint[]; scaleFactor: number }) {
   const geometries = useMemo(() => {
@@ -84,7 +85,81 @@ interface Scene3DProps {
   showAllAxes: boolean;
   showLine: boolean;
   showPoints: boolean;
+  viewPreset: ViewPreset | null;
   onPointClick: (pointIndex: number) => void;
+}
+
+function CameraController({ target, diagonal, viewPreset }: { target: THREE.Vector3; diagonal: number; viewPreset: ViewPreset | null }) {
+  const { camera } = useThree();
+  const controlsRef = useRef<any>(null);
+  const animating = useRef(false);
+  const animStart = useRef({ pos: new THREE.Vector3(), target: new THREE.Vector3() });
+  const animEnd = useRef({ pos: new THREE.Vector3(), target: new THREE.Vector3() });
+  const animProgress = useRef(0);
+  const prevPreset = useRef<ViewPreset | null>(null);
+
+  // Set Z as the up axis
+  useEffect(() => {
+    camera.up.set(0, 0, 1);
+    camera.updateProjectionMatrix();
+  }, [camera]);
+
+  useEffect(() => {
+    if (!viewPreset || viewPreset === prevPreset.current) return;
+    prevPreset.current = viewPreset;
+
+    const dist = diagonal * 1.5;
+    let newPos: THREE.Vector3;
+
+    switch (viewPreset) {
+      case 'front': // Look along -Y (facing XZ plane)
+        newPos = target.clone().add(new THREE.Vector3(0, -dist, 0));
+        break;
+      case 'top': // Look along -Z (facing XY plane, Z is up)
+        newPos = target.clone().add(new THREE.Vector3(0, 0, dist));
+        break;
+      case 'side': // Look along -X (facing YZ plane)
+        newPos = target.clone().add(new THREE.Vector3(-dist, 0, 0));
+        break;
+      case 'iso': // Isometric: offset in X, -Y, and Z (up)
+        newPos = target.clone().add(new THREE.Vector3(dist * 0.7, -dist * 0.7, dist * 0.5));
+        break;
+      case 'reset':
+        newPos = target.clone().add(new THREE.Vector3(dist * 0.7, -dist * 0.7, dist * 0.5));
+        break;
+      default:
+        return;
+    }
+
+    animStart.current.pos.copy(camera.position);
+    animStart.current.target.copy(controlsRef.current?.target ?? target);
+    animEnd.current.pos.copy(newPos);
+    animEnd.current.target.copy(target);
+    animProgress.current = 0;
+    animating.current = true;
+  }, [viewPreset, target, diagonal, camera]);
+
+  useFrame((_, delta) => {
+    if (!animating.current) return;
+
+    animProgress.current += delta * 3;
+    if (animProgress.current >= 1) {
+      animProgress.current = 1;
+      animating.current = false;
+    }
+
+    const t = 1 - Math.pow(1 - animProgress.current, 3); // ease out cubic
+    camera.position.lerpVectors(animStart.current.pos, animEnd.current.pos, t);
+
+    if (controlsRef.current) {
+      controlsRef.current.target.lerpVectors(animStart.current.target, animEnd.current.target, t);
+      controlsRef.current.update();
+    }
+
+    camera.lookAt(controlsRef.current?.target ?? target);
+  });
+
+  return <OrbitControls ref={controlsRef} target={target} />;
 }
 
 export default function Scene3D({
@@ -94,9 +169,10 @@ export default function Scene3D({
   showAllAxes,
   showLine,
   showPoints,
+  viewPreset,
   onPointClick,
 }: Scene3DProps) {
-  const { cameraTarget, scaleFactor, cameraPosition, near, far } = useMemo(() => {
+  const { cameraTarget, scaleFactor, cameraPosition, near, far, diagonal } = useMemo(() => {
     if (!path || path.points.length === 0) {
       return {
         cameraTarget: new THREE.Vector3(0, 0, 0),
@@ -104,6 +180,7 @@ export default function Scene3D({
         cameraPosition: new THREE.Vector3(10, 10, 10),
         near: 0.01,
         far: 2000,
+        diagonal: 10,
       };
     }
 
@@ -119,9 +196,9 @@ export default function Scene3D({
     const safeDiagonal = diagonal > 0 ? diagonal : 1;
     const sf = safeDiagonal * 0.01;
 
-    // Place camera far enough to see the whole path
+    // Place camera: Z is up, offset in X, -Y, and Z
     const camDist = safeDiagonal * 1.5;
-    const camPos = center.clone().add(new THREE.Vector3(camDist * 0.7, camDist * 0.5, camDist * 0.7));
+    const camPos = center.clone().add(new THREE.Vector3(camDist * 0.7, -camDist * 0.7, camDist * 0.5));
 
     // Tight near/far ratio to maximize depth buffer precision
     // near = small fraction of scene size, far = large multiple
@@ -134,6 +211,7 @@ export default function Scene3D({
       cameraPosition: camPos,
       near: Math.max(n, 0.001),
       far: Math.max(f, 100),
+      diagonal: safeDiagonal,
     };
   }, [path]);
 
@@ -149,7 +227,7 @@ export default function Scene3D({
     >
       <ambientLight intensity={0.6} />
       <directionalLight position={[100, 200, 100]} intensity={0.8} />
-      <OrbitControls target={cameraTarget} />
+      <CameraController target={cameraTarget} diagonal={diagonal} viewPreset={viewPreset} />
       {path && (
         <>
           {showLine && <PathLine points={path.points} color={path.color} />}

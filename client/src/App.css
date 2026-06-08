@@ -451,3 +451,60 @@ body {
 .btn-secondary:hover {
   background: #475569;
 }
+
+/* ViewTools */
+.view-tools {
+  padding: 16px;
+  border-bottom: 1px solid #334155;
+}
+
+.view-tools h3 {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.view-buttons {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.view-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 8px 12px;
+  background: #334155;
+  color: #e2e8f0;
+  border: 1px solid #475569;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  min-width: 48px;
+  transition: all 0.15s;
+}
+
+.view-btn:hover {
+  background: #475569;
+}
+
+.view-btn.active {
+  background: #1e40af;
+  border-color: #3b82f6;
+}
+
+.view-icon {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.view-label {
+  font-size: 11px;
+  color: #94a3b8;
+}
+
+.view-btn.active .view-label {
+  color: #93c5fd;
+}

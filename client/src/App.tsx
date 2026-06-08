@@ -7,6 +7,8 @@ import PathList from './components/PathList.js';
 import PointDetail from './components/PointDetail.js';
 import PlaybackBar from './components/PlaybackBar.js';
 import DisplayControls from './components/DisplayControls.js';
+import ViewTools from './components/ViewTools.js';
+import type { ViewPreset } from './components/ViewTools.js';
 import ColumnMapper from './components/ColumnMapper.js';
 import type { CsvUploadResult, ColumnMapping } from './types/index.js';
 import './App.css';
@@ -30,6 +32,7 @@ function App() {
   const [selectedPointIndex, setSelectedPointIndex] = useState<number | null>(null);
   const [uploadResult, setUploadResult] = useState<CsvUploadResult | null>(null);
   const [importFileName, setImportFileName] = useState('');
+  const [viewPreset, setViewPreset] = useState<ViewPreset | null>(null);
 
   const handleImportCsv = useCallback(async (file: File) => {
     try {
@@ -89,6 +92,7 @@ function App() {
             showAllAxes={showAllAxes}
             showLine={showLine}
             showPoints={showPoints}
+            viewPreset={viewPreset}
             onPointClick={handlePointClick}
           />
         </div>
@@ -117,6 +121,10 @@ function App() {
           onToggleAllAxes={() => setShowAllAxes((prev) => !prev)}
           onToggleLine={() => setShowLine((prev) => !prev)}
           onTogglePoints={() => setShowPoints((prev) => !prev)}
+        />
+        <ViewTools
+          currentView={viewPreset}
+          onViewChange={setViewPreset}
         />
         <PointDetail
           point={selectedPointIndex !== null ? selectedPath?.points[selectedPointIndex] || null : null}
