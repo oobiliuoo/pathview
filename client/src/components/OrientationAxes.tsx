@@ -9,7 +9,7 @@ interface OrientationAxesProps {
 }
 
 export default function OrientationAxes({ points, currentIndex, scaleFactor }: OrientationAxesProps) {
-  const axesData = useMemo(() => {
+  const geometries = useMemo(() => {
     const point = points[currentIndex];
     if (!point || point.rx === null || point.ry === null || point.rz === null) return null;
 
@@ -22,65 +22,38 @@ export default function OrientationAxes({ points, currentIndex, scaleFactor }: O
     const quaternion = new THREE.Quaternion().setFromEuler(euler);
     const axisLength = scaleFactor * 3;
 
-    const xDir = new THREE.Vector3(1, 0, 0).applyQuaternion(quaternion).multiplyScalar(axisLength);
-    const yDir = new THREE.Vector3(0, 1, 0).applyQuaternion(quaternion).multiplyScalar(axisLength);
-    const zDir = new THREE.Vector3(0, 0, 1).applyQuaternion(quaternion).multiplyScalar(axisLength);
+    const origin = [point.x, point.y, point.z];
+    const xEnd = new THREE.Vector3(1, 0, 0).applyQuaternion(quaternion).multiplyScalar(axisLength).add(new THREE.Vector3(point.x, point.y, point.z));
+    const yEnd = new THREE.Vector3(0, 1, 0).applyQuaternion(quaternion).multiplyScalar(axisLength).add(new THREE.Vector3(point.x, point.y, point.z));
+    const zEnd = new THREE.Vector3(0, 0, 1).applyQuaternion(quaternion).multiplyScalar(axisLength).add(new THREE.Vector3(point.x, point.y, point.z));
+
+    function makeGeom(end: THREE.Vector3) {
+      const g = new THREE.BufferGeometry();
+      g.setAttribute('position', new THREE.Float32BufferAttribute([...origin, end.x, end.y, end.z], 3));
+      return g;
+    }
 
     return {
-      origin: new THREE.Vector3(point.x, point.y, point.z),
-      xEnd: new THREE.Vector3(point.x, point.y, point.z).add(xDir),
-      yEnd: new THREE.Vector3(point.x, point.y, point.z).add(yDir),
-      zEnd: new THREE.Vector3(point.x, point.y, point.z).add(zDir),
+      x: makeGeom(xEnd),
+      y: makeGeom(yEnd),
+      z: makeGeom(zEnd),
     };
   }, [points, currentIndex, scaleFactor]);
 
-  if (!axesData) return null;
+  if (!geometries) return null;
 
   return (
     <group>
       {/* X axis - Red */}
-      <line frustumCulled={false}>
-        <bufferGeometry>
-          <bufferAttribute
-            attach="attributes-position"
-            count={2}
-            array={new Float32Array([
-              axesData.origin.x, axesData.origin.y, axesData.origin.z,
-              axesData.xEnd.x, axesData.xEnd.y, axesData.xEnd.z,
-            ])}
-            itemSize={3}
-          />
-        </bufferGeometry>
+      <line geometry={geometries.x} frustumCulled={false}>
         <lineBasicMaterial color="#ef4444" linewidth={3} />
       </line>
       {/* Y axis - Green */}
-      <line frustumCulled={false}>
-        <bufferGeometry>
-          <bufferAttribute
-            attach="attributes-position"
-            count={2}
-            array={new Float32Array([
-              axesData.origin.x, axesData.origin.y, axesData.origin.z,
-              axesData.yEnd.x, axesData.yEnd.y, axesData.yEnd.z,
-            ])}
-            itemSize={3}
-          />
-        </bufferGeometry>
+      <line geometry={geometries.y} frustumCulled={false}>
         <lineBasicMaterial color="#10b981" linewidth={3} />
       </line>
       {/* Z axis - Blue */}
-      <line frustumCulled={false}>
-        <bufferGeometry>
-          <bufferAttribute
-            attach="attributes-position"
-            count={2}
-            array={new Float32Array([
-              axesData.origin.x, axesData.origin.y, axesData.origin.z,
-              axesData.zEnd.x, axesData.zEnd.y, axesData.zEnd.z,
-            ])}
-            itemSize={3}
-          />
-        </bufferGeometry>
+      <line geometry={geometries.z} frustumCulled={false}>
         <lineBasicMaterial color="#3b82f6" linewidth={3} />
       </line>
     </group>

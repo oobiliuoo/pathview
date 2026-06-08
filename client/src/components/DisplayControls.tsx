@@ -1,17 +1,21 @@
 interface DisplayControlsProps {
   showAxes: boolean;
+  showAllAxes: boolean;
   showLine: boolean;
   showPoints: boolean;
   onToggleAxes: () => void;
+  onToggleAllAxes: () => void;
   onToggleLine: () => void;
   onTogglePoints: () => void;
 }
 
 export default function DisplayControls({
   showAxes,
+  showAllAxes,
   showLine,
   showPoints,
   onToggleAxes,
+  onToggleAllAxes,
   onToggleLine,
   onTogglePoints,
 }: DisplayControlsProps) {
@@ -25,7 +29,15 @@ export default function DisplayControls({
             checked={showAxes}
             onChange={onToggleAxes}
           />
-          <span>Orientation Axes</span>
+          <span>Current Axes</span>
+        </label>
+        <label className="control-item">
+          <input
+            type="checkbox"
+            checked={showAllAxes}
+            onChange={onToggleAllAxes}
+          />
+          <span>All Point Axes</span>
         </label>
         <label className="control-item">
           <input

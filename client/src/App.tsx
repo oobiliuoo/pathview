@@ -24,6 +24,7 @@ function App() {
 
   const playback = usePlayback(selectedPath?.points || []);
   const [showAxes, setShowAxes] = useState(true);
+  const [showAllAxes, setShowAllAxes] = useState(false);
   const [showLine, setShowLine] = useState(true);
   const [showPoints, setShowPoints] = useState(true);
   const [selectedPointIndex, setSelectedPointIndex] = useState<number | null>(null);
@@ -85,6 +86,7 @@ function App() {
             path={selectedPath}
             currentIndex={playback.currentIndex}
             showAxes={showAxes}
+            showAllAxes={showAllAxes}
             showLine={showLine}
             showPoints={showPoints}
             onPointClick={handlePointClick}
@@ -108,9 +110,11 @@ function App() {
       <div className="app-sidebar right">
         <DisplayControls
           showAxes={showAxes}
+          showAllAxes={showAllAxes}
           showLine={showLine}
           showPoints={showPoints}
           onToggleAxes={() => setShowAxes((prev) => !prev)}
+          onToggleAllAxes={() => setShowAllAxes((prev) => !prev)}
           onToggleLine={() => setShowLine((prev) => !prev)}
           onTogglePoints={() => setShowPoints((prev) => !prev)}
         />
