@@ -89,7 +89,7 @@ interface Scene3DProps {
   onPointClick: (pointIndex: number) => void;
 }
 
-function CameraController({ target, diagonal, viewPreset }: { target: THREE.Vector3; diagonal: number; viewPreset: ViewPreset | null }) {
+function CameraController({ target, diagonal, viewPreset, near, far }: { target: THREE.Vector3; diagonal: number; viewPreset: ViewPreset | null; near: number; far: number }) {
   const { camera } = useThree();
   const controlsRef = useRef<any>(null);
   const animating = useRef(false);
@@ -98,11 +98,13 @@ function CameraController({ target, diagonal, viewPreset }: { target: THREE.Vect
   const animProgress = useRef(0);
   const prevPreset = useRef<ViewPreset | null>(null);
 
-  // Set Z as the up axis
+  // Set Z as the up axis and update near/far when path changes
   useEffect(() => {
     camera.up.set(0, 0, 1);
+    camera.near = near;
+    camera.far = far;
     camera.updateProjectionMatrix();
-  }, [camera]);
+  }, [camera, near, far]);
 
   useEffect(() => {
     if (!viewPreset || viewPreset === prevPreset.current) return;
@@ -227,7 +229,7 @@ export default function Scene3D({
     >
       <ambientLight intensity={0.6} />
       <directionalLight position={[100, 200, 100]} intensity={0.8} />
-      <CameraController target={cameraTarget} diagonal={diagonal} viewPreset={viewPreset} />
+      <CameraController target={cameraTarget} diagonal={diagonal} viewPreset={viewPreset} near={near} far={far} />
       {path && (
         <>
           {showLine && <PathLine points={path.points} color={path.color} />}
