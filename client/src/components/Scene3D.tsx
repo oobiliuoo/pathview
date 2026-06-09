@@ -85,6 +85,7 @@ interface Scene3DProps {
   showAllAxes: boolean;
   showLine: boolean;
   showPoints: boolean;
+  pointSize: number;
   viewPreset: ViewPreset | null;
   onPointClick: (pointIndex: number) => void;
 }
@@ -171,6 +172,7 @@ export default function Scene3D({
   showAllAxes,
   showLine,
   showPoints,
+  pointSize,
   viewPreset,
   onPointClick,
 }: Scene3DProps) {
@@ -239,6 +241,7 @@ export default function Scene3D({
               currentIndex={currentIndex}
               color={path.color}
               scaleFactor={scaleFactor}
+              pointSize={pointSize}
               onPointClick={onPointClick}
             />
           )}

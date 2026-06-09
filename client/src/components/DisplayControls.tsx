@@ -3,10 +3,12 @@ interface DisplayControlsProps {
   showAllAxes: boolean;
   showLine: boolean;
   showPoints: boolean;
+  pointSize: number;
   onToggleAxes: () => void;
   onToggleAllAxes: () => void;
   onToggleLine: () => void;
   onTogglePoints: () => void;
+  onPointSizeChange: (size: number) => void;
 }
 
 export default function DisplayControls({
@@ -14,10 +16,12 @@ export default function DisplayControls({
   showAllAxes,
   showLine,
   showPoints,
+  pointSize,
   onToggleAxes,
   onToggleAllAxes,
   onToggleLine,
   onTogglePoints,
+  onPointSizeChange,
 }: DisplayControlsProps) {
   return (
     <div className="display-controls">
@@ -55,6 +59,19 @@ export default function DisplayControls({
           />
           <span>Point Markers</span>
         </label>
+        <div className="control-item slider-item">
+          <span>Size</span>
+          <input
+            type="range"
+            min="1"
+            max="500"
+            step="1"
+            value={Math.round(pointSize * 100)}
+            onChange={(e) => onPointSizeChange(parseInt(e.target.value) / 100)}
+            className="size-slider"
+          />
+          <span className="size-value">{Math.round(pointSize * 100)}%</span>
+        </div>
       </div>
     </div>
   );

@@ -7,6 +7,7 @@ interface PathPointsProps {
   currentIndex: number;
   color: string;
   scaleFactor: number;
+  pointSize: number;
   onPointClick: (pointIndex: number) => void;
 }
 
@@ -15,6 +16,7 @@ export default function PathPoints({
   currentIndex,
   color,
   scaleFactor,
+  pointSize,
   onPointClick,
 }: PathPointsProps) {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
@@ -24,7 +26,7 @@ export default function PathPoints({
       {points.map((point, index) => {
         const isCurrent = index === currentIndex;
         const isHovered = index === hoveredIndex;
-        const size = (isCurrent ? scaleFactor * 1.5 : isHovered ? scaleFactor * 1.2 : scaleFactor) * 0.5;
+        const size = (isCurrent ? scaleFactor * 1.5 : isHovered ? scaleFactor * 1.2 : scaleFactor) * 0.5 * pointSize;
         
         return (
           <mesh
