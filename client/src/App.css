@@ -17,6 +17,11 @@ body {
   width: 100vw;
 }
 
+.app.drag-over {
+  outline: 3px dashed #3b82f6;
+  outline-offset: -3px;
+}
+
 .app-sidebar {
   width: 280px;
   background: #1e293b;

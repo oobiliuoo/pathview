@@ -36,6 +36,7 @@ function App() {
   const [uploadResult, setUploadResult] = useState<CsvUploadResult | null>(null);
   const [importFileName, setImportFileName] = useState('');
   const [viewPreset, setViewPreset] = useState<ViewPreset | null>(null);
+  const [dragOver, setDragOver] = useState(false);
 
   const handleImportCsv = useCallback(async (file: File) => {
     try {
@@ -74,8 +75,31 @@ function App() {
     setSelectedPointIndex(index);
   }, []);
 
+  const handleDragOver = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragOver(true);
+  }, []);
+
+  const handleDrop = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragOver(false);
+    const files = Array.from(e.dataTransfer.files);
+    const csvFile = files.find((f) => f.name.endsWith('.csv') || f.type === 'text/csv');
+    if (csvFile) {
+      handleImportCsv(csvFile);
+    }
+  }, [handleImportCsv]);
+
+  const handleDragLeave = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragOver(false);
+  }, []);
+
   return (
-    <div className="app">
+    <div className={`app ${dragOver ? 'drag-over' : ''}`} onDragOver={handleDragOver} onDrop={handleDrop} onDragLeave={handleDragLeave}>
       <div className="app-sidebar left">
         <PathList
           paths={paths}
