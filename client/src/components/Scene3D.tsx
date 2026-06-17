@@ -8,7 +8,7 @@ import PathPoints from './PathPoints.js';
 import OrientationAxes from './OrientationAxes.js';
 import type { ViewPreset } from './ViewTools.js';
 
-function AllOrientationAxes({ points, scaleFactor }: { points: PathPoint[]; scaleFactor: number }) {
+function AllOrientationAxes({ points, scaleFactor, axesFilter }: { points: PathPoint[]; scaleFactor: number; axesFilter: { x: boolean; y: boolean; z: boolean } }) {
   const geometries = useMemo(() => {
     const result: { origin: number[]; xEnd: THREE.Vector3; yEnd: THREE.Vector3; zEnd: THREE.Vector3 }[] = [];
     const axisLength = scaleFactor * 2;
@@ -39,7 +39,7 @@ function AllOrientationAxes({ points, scaleFactor }: { points: PathPoint[]; scal
     <group>
       {geometries.map((axes, i) => (
         <group key={i}>
-          <line frustumCulled={false}>
+          {axesFilter.x && <line frustumCulled={false}>
             <bufferGeometry>
               <bufferAttribute
                 attach="attributes-position"
@@ -49,8 +49,8 @@ function AllOrientationAxes({ points, scaleFactor }: { points: PathPoint[]; scal
               />
             </bufferGeometry>
             <lineBasicMaterial color="#ef4444" linewidth={1} transparent opacity={0.4} />
-          </line>
-          <line frustumCulled={false}>
+          </line>}
+          {axesFilter.y && <line frustumCulled={false}>
             <bufferGeometry>
               <bufferAttribute
                 attach="attributes-position"
@@ -60,8 +60,8 @@ function AllOrientationAxes({ points, scaleFactor }: { points: PathPoint[]; scal
               />
             </bufferGeometry>
             <lineBasicMaterial color="#10b981" linewidth={1} transparent opacity={0.4} />
-          </line>
-          <line frustumCulled={false}>
+          </line>}
+          {axesFilter.z && <line frustumCulled={false}>
             <bufferGeometry>
               <bufferAttribute
                 attach="attributes-position"
@@ -71,7 +71,7 @@ function AllOrientationAxes({ points, scaleFactor }: { points: PathPoint[]; scal
               />
             </bufferGeometry>
             <lineBasicMaterial color="#3b82f6" linewidth={1} transparent opacity={0.4} />
-          </line>
+          </line>}
         </group>
       ))}
     </group>
@@ -86,6 +86,7 @@ interface Scene3DProps {
   showLine: boolean;
   showPoints: boolean;
   pointSize: number;
+  axesFilter: { x: boolean; y: boolean; z: boolean };
   viewPreset: ViewPreset | null;
   onPointClick: (pointIndex: number) => void;
 }
@@ -173,6 +174,7 @@ export default function Scene3D({
   showLine,
   showPoints,
   pointSize,
+  axesFilter,
   viewPreset,
   onPointClick,
 }: Scene3DProps) {
@@ -250,10 +252,11 @@ export default function Scene3D({
               points={path.points}
               currentIndex={currentIndex}
               scaleFactor={scaleFactor}
+              axesFilter={axesFilter}
             />
           )}
           {showAllAxes && path.has_orientation && (
-            <AllOrientationAxes points={path.points} scaleFactor={scaleFactor} />
+            <AllOrientationAxes points={path.points} scaleFactor={scaleFactor} axesFilter={axesFilter} />
           )}
         </>
       )}

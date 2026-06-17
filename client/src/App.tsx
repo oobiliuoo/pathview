@@ -31,6 +31,7 @@ function App() {
   const [showLine, setShowLine] = useState(true);
   const [showPoints, setShowPoints] = useState(true);
   const [pointSize, setPointSize] = useState(1);
+  const [axesFilter, setAxesFilter] = useState({ x: true, y: true, z: true });
   const [selectedPointIndex, setSelectedPointIndex] = useState<number | null>(null);
   const [uploadResult, setUploadResult] = useState<CsvUploadResult | null>(null);
   const [importFileName, setImportFileName] = useState('');
@@ -95,6 +96,7 @@ function App() {
             showLine={showLine}
             showPoints={showPoints}
             pointSize={pointSize}
+            axesFilter={axesFilter}
             viewPreset={viewPreset}
             onPointClick={handlePointClick}
           />
@@ -121,11 +123,13 @@ function App() {
           showLine={showLine}
           showPoints={showPoints}
           pointSize={pointSize}
+          axesFilter={axesFilter}
           onToggleAxes={() => setShowAxes((prev) => !prev)}
           onToggleAllAxes={() => setShowAllAxes((prev) => !prev)}
           onToggleLine={() => setShowLine((prev) => !prev)}
           onTogglePoints={() => setShowPoints((prev) => !prev)}
           onPointSizeChange={setPointSize}
+          onAxesFilterChange={setAxesFilter}
         />
         <ViewTools
           currentView={viewPreset}

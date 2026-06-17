@@ -6,9 +6,10 @@ interface OrientationAxesProps {
   points: PathPoint[];
   currentIndex: number;
   scaleFactor: number;
+  axesFilter: { x: boolean; y: boolean; z: boolean };
 }
 
-export default function OrientationAxes({ points, currentIndex, scaleFactor }: OrientationAxesProps) {
+export default function OrientationAxes({ points, currentIndex, scaleFactor, axesFilter }: OrientationAxesProps) {
   const geometries = useMemo(() => {
     const point = points[currentIndex];
     if (!point || point.rx === null || point.ry === null || point.rz === null) return null;
@@ -44,18 +45,15 @@ export default function OrientationAxes({ points, currentIndex, scaleFactor }: O
 
   return (
     <group>
-      {/* X axis - Red */}
-      <line geometry={geometries.x} frustumCulled={false}>
+      {axesFilter.x && <line geometry={geometries.x} frustumCulled={false}>
         <lineBasicMaterial color="#ef4444" linewidth={3} />
-      </line>
-      {/* Y axis - Green */}
-      <line geometry={geometries.y} frustumCulled={false}>
+      </line>}
+      {axesFilter.y && <line geometry={geometries.y} frustumCulled={false}>
         <lineBasicMaterial color="#10b981" linewidth={3} />
-      </line>
-      {/* Z axis - Blue */}
-      <line geometry={geometries.z} frustumCulled={false}>
+      </line>}
+      {axesFilter.z && <line geometry={geometries.z} frustumCulled={false}>
         <lineBasicMaterial color="#3b82f6" linewidth={3} />
-      </line>
+      </line>}
     </group>
   );
 }

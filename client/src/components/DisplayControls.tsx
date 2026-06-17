@@ -4,11 +4,13 @@ interface DisplayControlsProps {
   showLine: boolean;
   showPoints: boolean;
   pointSize: number;
+  axesFilter: { x: boolean; y: boolean; z: boolean };
   onToggleAxes: () => void;
   onToggleAllAxes: () => void;
   onToggleLine: () => void;
   onTogglePoints: () => void;
   onPointSizeChange: (size: number) => void;
+  onAxesFilterChange: (filter: { x: boolean; y: boolean; z: boolean }) => void;
 }
 
 export default function DisplayControls({
@@ -17,11 +19,13 @@ export default function DisplayControls({
   showLine,
   showPoints,
   pointSize,
+  axesFilter,
   onToggleAxes,
   onToggleAllAxes,
   onToggleLine,
   onTogglePoints,
   onPointSizeChange,
+  onAxesFilterChange,
 }: DisplayControlsProps) {
   return (
     <div className="display-controls">
@@ -59,6 +63,32 @@ export default function DisplayControls({
           />
           <span>Point Markers</span>
         </label>
+        <div className="axes-filter">
+          <label className="control-item">
+            <input
+              type="checkbox"
+              checked={axesFilter.x}
+              onChange={() => onAxesFilterChange({ ...axesFilter, x: !axesFilter.x })}
+            />
+            <span style={{ color: '#ef4444' }}>X Axis</span>
+          </label>
+          <label className="control-item">
+            <input
+              type="checkbox"
+              checked={axesFilter.y}
+              onChange={() => onAxesFilterChange({ ...axesFilter, y: !axesFilter.y })}
+            />
+            <span style={{ color: '#10b981' }}>Y Axis</span>
+          </label>
+          <label className="control-item">
+            <input
+              type="checkbox"
+              checked={axesFilter.z}
+              onChange={() => onAxesFilterChange({ ...axesFilter, z: !axesFilter.z })}
+            />
+            <span style={{ color: '#3b82f6' }}>Z Axis</span>
+          </label>
+        </div>
         <div className="control-item slider-item">
           <span>Size</span>
           <input
