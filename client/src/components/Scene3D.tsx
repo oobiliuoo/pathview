@@ -6,7 +6,7 @@ import type { PathPoint, PathWithPoints } from '../types/index.js';
 import PathLine from './PathLine.js';
 import PathPoints from './PathPoints.js';
 import OrientationAxes from './OrientationAxes.js';
-import type { ViewPreset } from './ViewTools.js';
+import type { ViewPreset, OrbitTarget } from './ViewTools.js';
 
 function AllOrientationAxes({ points, scaleFactor, axesFilter }: { points: PathPoint[]; scaleFactor: number; axesFilter: { x: boolean; y: boolean; z: boolean } }) {
   const geometries = useMemo(() => {
@@ -87,11 +87,12 @@ interface Scene3DProps {
   showPoints: boolean;
   pointSize: number;
   axesFilter: { x: boolean; y: boolean; z: boolean };
+  orbitTarget: OrbitTarget;
   viewPreset: ViewPreset | null;
   onPointClick: (pointIndex: number) => void;
 }
 
-function CameraController({ target, diagonal, viewPreset, near, far }: { target: THREE.Vector3; diagonal: number; viewPreset: ViewPreset | null; near: number; far: number }) {
+function CameraController({ target, orbitTargetProp, currentPointPos, diagonal, viewPreset, near, far }: { target: THREE.Vector3; orbitTargetProp: OrbitTarget; currentPointPos: THREE.Vector3 | null; diagonal: number; viewPreset: ViewPreset | null; near: number; far: number }) {
   const { camera } = useThree();
   const controlsRef = useRef<any>(null);
   const animating = useRef(false);
@@ -107,6 +108,15 @@ function CameraController({ target, diagonal, viewPreset, near, far }: { target:
     camera.far = far;
     camera.updateProjectionMatrix();
   }, [camera, near, far]);
+
+  // Update orbit target when orbitTarget mode or current point changes
+  const orbitCenter = orbitTargetProp === 'current' && currentPointPos ? currentPointPos : target;
+  useEffect(() => {
+    if (controlsRef.current) {
+      controlsRef.current.target.copy(orbitCenter);
+      controlsRef.current.update();
+    }
+  }, [orbitCenter]);
 
   useEffect(() => {
     if (!viewPreset || viewPreset === prevPreset.current) return;
@@ -136,12 +146,12 @@ function CameraController({ target, diagonal, viewPreset, near, far }: { target:
     }
 
     animStart.current.pos.copy(camera.position);
-    animStart.current.target.copy(controlsRef.current?.target ?? target);
+    animStart.current.target.copy(controlsRef.current?.target ?? orbitCenter);
     animEnd.current.pos.copy(newPos);
-    animEnd.current.target.copy(target);
+    animEnd.current.target.copy(orbitCenter);
     animProgress.current = 0;
     animating.current = true;
-  }, [viewPreset, target, diagonal, camera]);
+  }, [viewPreset, diagonal, camera, orbitCenter]);
 
   useFrame((_, delta) => {
     if (!animating.current) return;
@@ -175,10 +185,11 @@ export default function Scene3D({
   showPoints,
   pointSize,
   axesFilter,
+  orbitTarget,
   viewPreset,
   onPointClick,
 }: Scene3DProps) {
-  const { cameraTarget, scaleFactor, cameraPosition, near, far, diagonal } = useMemo(() => {
+  const { cameraTarget, scaleFactor, cameraPosition, near, far, diagonal, currentPointPos } = useMemo(() => {
     if (!path || path.points.length === 0) {
       return {
         cameraTarget: new THREE.Vector3(0, 0, 0),
@@ -187,6 +198,7 @@ export default function Scene3D({
         near: 0.01,
         far: 2000,
         diagonal: 10,
+        currentPointPos: null,
       };
     }
 
@@ -211,6 +223,10 @@ export default function Scene3D({
     const n = safeDiagonal * 0.001;
     const f = safeDiagonal * 100;
 
+    // Current point position for orbit center
+    const pt = path.points[currentIndex];
+    const currentPointPos = pt ? new THREE.Vector3(pt.x, pt.y, pt.z) : null;
+
     return {
       cameraTarget: center,
       scaleFactor: sf,
@@ -218,8 +234,9 @@ export default function Scene3D({
       near: Math.max(n, 0.001),
       far: Math.max(f, 100),
       diagonal: safeDiagonal,
+      currentPointPos,
     };
-  }, [path]);
+  }, [path, currentIndex]);
 
   return (
     <Canvas
@@ -233,7 +250,7 @@ export default function Scene3D({
     >
       <ambientLight intensity={0.6} />
       <directionalLight position={[100, 200, 100]} intensity={0.8} />
-      <CameraController target={cameraTarget} diagonal={diagonal} viewPreset={viewPreset} near={near} far={far} />
+      <CameraController target={cameraTarget} orbitTargetProp={orbitTarget} currentPointPos={currentPointPos} diagonal={diagonal} viewPreset={viewPreset} near={near} far={far} />
       {path && (
         <>
           {showLine && <PathLine points={path.points} color={path.color} />}

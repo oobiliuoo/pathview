@@ -8,7 +8,7 @@ import PointDetail from './components/PointDetail.js';
 import PlaybackBar from './components/PlaybackBar.js';
 import DisplayControls from './components/DisplayControls.js';
 import ViewTools from './components/ViewTools.js';
-import type { ViewPreset } from './components/ViewTools.js';
+import type { ViewPreset, OrbitTarget } from './components/ViewTools.js';
 import ColumnMapper from './components/ColumnMapper.js';
 import type { CsvUploadResult, ColumnMapping } from './types/index.js';
 import './App.css';
@@ -36,6 +36,7 @@ function App() {
   const [uploadResult, setUploadResult] = useState<CsvUploadResult | null>(null);
   const [importFileName, setImportFileName] = useState('');
   const [viewPreset, setViewPreset] = useState<ViewPreset | null>(null);
+  const [orbitTarget, setOrbitTarget] = useState<OrbitTarget>('center');
   const [dragOver, setDragOver] = useState(false);
 
   const handleImportCsv = useCallback(async (file: File) => {
@@ -73,7 +74,11 @@ function App() {
 
   const handlePointClick = useCallback((index: number) => {
     setSelectedPointIndex(index);
-  }, []);
+    const total = selectedPath?.points.length;
+    if (total && total > 1) {
+      playback.seek(index / (total - 1));
+    }
+  }, [playback, selectedPath]);
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -121,6 +126,7 @@ function App() {
             showPoints={showPoints}
             pointSize={pointSize}
             axesFilter={axesFilter}
+            orbitTarget={orbitTarget}
             viewPreset={viewPreset}
             onPointClick={handlePointClick}
           />
@@ -157,7 +163,9 @@ function App() {
         />
         <ViewTools
           currentView={viewPreset}
+          orbitTarget={orbitTarget}
           onViewChange={setViewPreset}
+          onOrbitTargetChange={setOrbitTarget}
         />
         <PointDetail
           point={selectedPointIndex !== null ? selectedPath?.points[selectedPointIndex] || null : null}
