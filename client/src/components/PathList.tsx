@@ -1,4 +1,4 @@
-import { useState, useRef, ChangeEvent } from 'react';
+import { useState, useRef, ChangeEvent, KeyboardEvent } from 'react';
 import type { Path } from '../types/index.js';
 
 // 7 hues × 5 brightness levels
@@ -19,6 +19,7 @@ interface PathListProps {
   onDeletePath: (id: number) => void;
   onImportCsv: (file: File) => void;
   onChangeColor: (id: number, color: string) => void;
+  onRenamePath: (id: number, name: string) => void;
 }
 
 export default function PathList({
@@ -28,9 +29,13 @@ export default function PathList({
   onDeletePath,
   onImportCsv,
   onChangeColor,
+  onRenamePath,
 }: PathListProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [colorPickerId, setColorPickerId] = useState<number | null>(null);
+  const [editingId, setEditingId] = useState<number | null>(null);
+  const [editName, setEditName] = useState('');
+  const editInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -77,7 +82,40 @@ export default function PathList({
                     setColorPickerId(colorPickerId === path.id ? null : path.id);
                   }}
                 />
-                <span className="path-name">{path.name}</span>
+                {editingId === path.id ? (
+                  <input
+                    ref={editInputRef}
+                    className="path-name-input"
+                    value={editName}
+                    onChange={(e: ChangeEvent<HTMLInputElement>) => setEditName(e.target.value)}
+                    onKeyDown={(e: KeyboardEvent<HTMLInputElement>) => {
+                      if (e.key === 'Enter') {
+                        if (editName.trim()) onRenamePath(path.id, editName.trim());
+                        setEditingId(null);
+                      } else if (e.key === 'Escape') {
+                        setEditingId(null);
+                      }
+                    }}
+                    onBlur={() => {
+                      if (editName.trim()) onRenamePath(path.id, editName.trim());
+                      setEditingId(null);
+                    }}
+                    onClick={(e) => e.stopPropagation()}
+                  />
+                ) : (
+                  <span
+                    className="path-name"
+                    onDoubleClick={(e) => {
+                      e.stopPropagation();
+                      setEditingId(path.id);
+                      setEditName(path.name);
+                      setTimeout(() => editInputRef.current?.focus(), 0);
+                    }}
+                    title="Double-click to rename"
+                  >
+                    {path.name}
+                  </span>
+                )}
               </div>
               {colorPickerId === path.id && (
                 <div className="color-picker" onClick={(e) => e.stopPropagation()}>

@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import type { Path, PathWithPoints } from '../types/index.js';
-import { fetchPaths, fetchPathWithPoints, deletePath, updatePathColor } from '../api/paths.js';
+import { fetchPaths, fetchPathWithPoints, deletePath, updatePathColor, updatePathName } from '../api/paths.js';
 
 export function usePaths() {
   const [paths, setPaths] = useState<Path[]>([]);
@@ -54,6 +54,16 @@ export function usePaths() {
     }
   }, [selectedPath]);
 
+  const renamePath = useCallback(async (id: number, name: string) => {
+    try {
+      await updatePathName(id, name);
+      setPaths((prev) => prev.map((p) => p.id === id ? { ...p, name } : p));
+      if (selectedPath?.id === id) setSelectedPath((prev) => prev ? { ...prev, name } : null);
+    } catch (err) {
+      setError((err as Error).message);
+    }
+  }, [selectedPath]);
+
   useEffect(() => {
     loadPaths();
   }, [loadPaths]);
@@ -67,6 +77,7 @@ export function usePaths() {
     loadPathDetail,
     removePath,
     changeColor,
+    renamePath,
     setSelectedPath,
   };
 }

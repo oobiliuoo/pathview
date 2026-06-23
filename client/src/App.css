@@ -187,6 +187,19 @@ body {
 .path-name {
   font-weight: 500;
   font-size: 14px;
+  cursor: pointer;
+}
+
+.path-name-input {
+  font-weight: 500;
+  font-size: 14px;
+  background: #0f172a;
+  color: #e2e8f0;
+  border: 1px solid #3b82f6;
+  border-radius: 4px;
+  padding: 2px 6px;
+  outline: none;
+  width: 180px;
 }
 
 .path-meta {

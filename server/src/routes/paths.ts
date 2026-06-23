@@ -155,6 +155,19 @@ router.get('/:id', (req, res) => {
   res.json({ ...path, points: pathPoints });
 });
 
+// PATCH /api/paths/:id/name - update path name
+router.patch('/:id/name', (req, res) => {
+  const id = Number(req.params.id);
+  if (isNaN(id)) return res.status(400).json({ error: 'Invalid path id' });
+  const { name } = req.body;
+  if (!name || typeof name !== 'string' || name.trim().length === 0) {
+    return res.status(400).json({ error: 'name is required' });
+  }
+  const result = db.prepare('UPDATE paths SET name = ? WHERE id = ?').run(name.trim(), id);
+  if (result.changes === 0) return res.status(404).json({ error: 'Path not found' });
+  res.json({ id, name: name.trim() });
+});
+
 // PATCH /api/paths/:id/color - update path color
 router.patch('/:id/color', (req, res) => {
   const id = Number(req.params.id);

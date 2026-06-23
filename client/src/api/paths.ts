@@ -42,6 +42,16 @@ export async function updatePathColor(id: number, color: string): Promise<{ id: 
   return res.json();
 }
 
+export async function updatePathName(id: number, name: string): Promise<{ id: number; name: string }> {
+  const res = await fetch(`${API_BASE}/${id}/name`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name }),
+  });
+  if (!res.ok) throw new Error('Failed to update path name');
+  return res.json();
+}
+
 export async function uploadCsv(file: File): Promise<CsvUploadResult> {
   const formData = new FormData();
   formData.append('file', file);
